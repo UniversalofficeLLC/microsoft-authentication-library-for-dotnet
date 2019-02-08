@@ -137,7 +137,7 @@ namespace Microsoft.Identity.Test.Unit
             string.Format(CultureInfo.InvariantCulture, "{0}.{1}", OnPremiseUid, OnPremiseUtid), OnPremiseDisplayableId, null);
 
         // broker tests
-        public const string BrokerExtraQueryParameters = "testQueryParameters";
+        public const string BrokerExtraQueryParameters = "extra=qp&key1=value1%20with%20encoded%20space&key2=value2";
         public const string BrokerClaims = "testClaims";
 
         public const string BrokerSecret = "testClientSecret";

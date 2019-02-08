@@ -27,12 +27,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.Identity.Client.ApiConfig.Parameters;
 using Microsoft.Identity.Client.AppConfig;
 using Microsoft.Identity.Client.Cache;
 using Microsoft.Identity.Client.Core;
 using Microsoft.Identity.Client.Instance;
+using Microsoft.Identity.Client.Internal.Broker;
 using Microsoft.Identity.Client.TelemetryCore;
 using Microsoft.Identity.Client.Utils;
 
@@ -43,8 +45,8 @@ namespace Microsoft.Identity.Client.Internal.Requests
         public AuthenticationRequestParameters(
             IServiceBundle serviceBundle,
             Authority customAuthority,
-            ITokenCacheInternal tokenCache, 
-            AcquireTokenCommonParameters commonParameters, 
+            ITokenCacheInternal tokenCache,
+            AcquireTokenCommonParameters commonParameters,
             RequestContext requestContext)
         {
             Authority authorityInstance = customAuthority ?? (commonParameters.AuthorityOverride == null
@@ -76,7 +78,6 @@ namespace Microsoft.Identity.Client.Internal.Requests
 
             // Prefer the call-specific claims, otherwise use the app config
             Claims = commonParameters.Claims ?? serviceBundle.Config.Claims;
-
         }
 
         public ApiEvent.ApiIds ApiId { get; }
@@ -86,7 +87,7 @@ namespace Microsoft.Identity.Client.Internal.Requests
         public AuthorityInfo AuthorityInfo => Authority.AuthorityInfo;
         public AuthorityEndpoints Endpoints { get; set; }
         public string TenantUpdatedCanonicalAuthority { get; set; }
-        public ICacheSessionManager CacheSessionManager{ get; set; }
+        public ICacheSessionManager CacheSessionManager { get; set; }
         public SortedSet<string> Scope { get; set; }
         public string ClientId { get; set; }
         public Uri RedirectUri { get; set; }
@@ -133,6 +134,40 @@ namespace Microsoft.Identity.Client.Internal.Requests
             builder.AppendLine("Scopes - " + Scope?.AsSingleString());
             builder.AppendLine("Extra Query Params Keys (space separated) - " + ExtraQueryParameters.Keys.AsSingleString());
             logger.InfoPii(messageWithPii, builder.ToString());
+        }
+
+        public Dictionary<string, string> CreateRequestParametersForBroker()
+        {
+            Dictionary<string, string> brokerPayload = new Dictionary<string, string>();
+
+            brokerPayload.Add(BrokerParameter.Authority, Authority.AuthorityInfo.CanonicalAuthority);
+            string scopes = ScopeHelper.ConvertSortedSetScopesToString(Scope);
+
+            brokerPayload.Add(BrokerParameter.RequestScopes, scopes);
+            brokerPayload.Add(BrokerParameter.ClientId, ClientId);
+            brokerPayload.Add(BrokerParameter.CorrelationId, RequestContext.Logger.CorrelationId.ToString());
+            brokerPayload.Add(BrokerParameter.ClientVersion, MsalIdHelper.GetMsalVersion());
+            brokerPayload.Add(BrokerParameter.Force, "NO");
+            brokerPayload.Add(BrokerParameter.RedirectUri, RedirectUri.AbsoluteUri);
+
+            string extraQP = string.Join("&", ExtraQueryParameters.Select(x => x.Key + "=" + x.Value));
+            brokerPayload.Add(BrokerParameter.ExtraQp, extraQP);
+
+            brokerPayload.Add(BrokerParameter.Username, Account?.Username ?? string.Empty);
+            brokerPayload.Add(BrokerParameter.ExtraOidcScopes, BrokerParameter.OidcScopesValue);
+
+            return brokerPayload;
+        }
+
+        public Dictionary<string, string> CreateSilentRequestParametersForBroker()
+        {
+            Dictionary<string, string> brokerPayload;
+
+            brokerPayload = (CreateRequestParametersForBroker());
+
+            brokerPayload.Add(BrokerParameter.SilentBrokerFlow, null);
+
+            return brokerPayload;
         }
     }
 }

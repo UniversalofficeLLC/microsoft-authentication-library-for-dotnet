@@ -56,6 +56,12 @@ namespace XForms.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            DependencyService.Register<iOSBrokerParameters>();
+
+            iOSBrokerParameters.UIViewController = this;
+
+            App.UIParent = new UIParent(iOSBrokerParameters.UIViewController, true);
         }
     }
 }

@@ -39,18 +39,18 @@ using Microsoft.Identity.Client.Internal.Broker;
 using Microsoft.Identity.Client.UI;
 using Microsoft.Identity.Client.AppConfig;
 using Microsoft.Identity.Client.Exceptions;
+using Microsoft.Identity.Client.ApiConfig;
 
 namespace Microsoft.Identity.Client.Platforms.iOS
 {
     /// <summary>
     /// Handles requests which invoke the broker. This is only for mobile (iOS and Android) scenarios.
     /// </summary>
-    internal class iOSBroker : IBroker
+    internal class iOSBroker : NSObject, IBroker 
     {
         private static SemaphoreSlim brokerResponseReady = null;
 
         private static NSUrl brokerResponse = null;
-        private readonly ApplicationConfiguration brokerRequest;
         private Dictionary<string, string> _brokerPayload;
 
         private readonly ICoreLogger _logger;
@@ -61,33 +61,33 @@ namespace Microsoft.Identity.Client.Platforms.iOS
             _logger = logger;
         }
 
-        public bool CanInvokeBroker
+        public bool CanInvokeBroker(OwnerUiParent uiParent, IServiceBundle serviceBundle)
         {
-            get
+            _serviceBundle = serviceBundle;
+
+            if (uiParent == null)
             {
-                CoreUIParent uiParent = new CoreUIParent();
-                if (!brokerRequest.IsBrokerEnabled)
-                {
-                    return false;
-                }
-
-                var result = false;
-
-                if (brokerRequest.IsBrokerEnabled)
-                {
-                    uiParent.CallerViewController.InvokeOnMainThread(() =>
-                    {
-                        result = UIApplication.SharedApplication.CanOpenUrl(new NSUrl("msauthv2://"));
-                    });
-                }
-
-                return result;
+                _logger.Verbose("UIParent is null cannot invoke broker. ");
+                return false;
             }
+
+            var result = false;
+
+            if (_serviceBundle.Config.IsBrokerEnabled)
+            {
+                _logger.Verbose("Can invoke broker? " + _serviceBundle.Config.IsBrokerEnabled);
+                
+                 uiParent.CoreUiParent.CallerViewController.InvokeOnMainThread(() =>
+                {
+                    result = UIApplication.SharedApplication.CanOpenUrl(new NSUrl("msauthv2://"));
+                });
+            }
+
+            return result;
         }
 
         public async Task<MsalTokenResponse> AcquireTokenUsingBrokerAsync(Dictionary<string, string> brokerPayload, IServiceBundle serviceBundle)
         {
-            _serviceBundle = serviceBundle;
             _brokerPayload = brokerPayload;
 
             CheckBrokerPayloadForSilentFlow();
@@ -130,6 +130,8 @@ namespace Microsoft.Identity.Client.Platforms.iOS
         {
             if (_brokerPayload.ContainsKey(BrokerParameter.BrokerInstallUrl))
             {
+                _logger.Info("iOS Broker - broker payload contains install url");
+
                 string url = _brokerPayload[BrokerParameter.BrokerInstallUrl];
                 Uri uri = new Uri(url);
                 string query = uri.Query;
@@ -142,7 +144,7 @@ namespace Microsoft.Identity.Client.Platforms.iOS
                 _logger.Info(iOSBrokerConstants.InvokeIosBrokerAppLink);
 
                 Dictionary<string, string> keyPair = CoreHelpers.ParseKeyValueList(query, '&', true, false, null);
-
+                _logger.Info("iOS Broker - Starting ActionView activity to " + iOSBrokerConstants.AppLink);
                 DispatchQueue.MainQueue.DispatchAsync(() => UIApplication.SharedApplication.OpenUrl(new NSUrl(keyPair[iOSBrokerConstants.AppLink])));
 
                 throw new MsalClientException(MsalErrorIOSEx.BrokerApplicationRequired, MsalErrorMessageIOSEx.BrokerApplicationRequired);

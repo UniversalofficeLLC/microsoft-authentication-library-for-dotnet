@@ -27,6 +27,7 @@
 
 using Microsoft.Identity.Client.Internal;
 using Microsoft.Identity.Client.UI;
+using UIKit;
 
 namespace Microsoft.Identity.Client
 {
@@ -56,9 +57,20 @@ namespace Microsoft.Identity.Client
             CoreUIParent.UseEmbeddedWebview = useEmbeddedWebview;
         }
 
+        /// <summary>
+        /// Constructor for iOS for directing the application to use the embedded webview instead of the
+        /// system browser. See https://aka.ms/msal-net-uses-web-browser
+        /// </summary>
+        /// <remarks>This method is likely to be removed (replaced) before final release</remarks>
+        public UIParent(UIViewController uiViewController, bool useEmbeddedWebview) : this()
+        {
+            CoreUIParent.UseEmbeddedWebview = useEmbeddedWebview;
+            CoreUIParent.CallerViewController = uiViewController;
+        }
+
 #if iOS_RUNTIME
         /// <summary>
-        /// Platform agnostic constructor that allows building an UIParent from a NetStandard assembly.
+        /// Platform agnostic constructor that allows building a UIParent from a NetStandard assembly.
         /// On iOS, the parent is ignored, you can pass null.
         /// </summary>
         /// <remarks>This constructor is only avaiable at runtime, to provide support for NetStandard</remarks>
@@ -67,6 +79,7 @@ namespace Microsoft.Identity.Client
         public UIParent(object parent, bool useEmbeddedWebview) :
             this(useEmbeddedWebview)
         {
+
         }
 #endif
 

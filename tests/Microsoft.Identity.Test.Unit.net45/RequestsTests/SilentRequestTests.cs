@@ -201,32 +201,31 @@ namespace Microsoft.Identity.Test.Unit.RequestsTests
         {
             using (var harness = new MockHttpTestHarness(MsalTestConstants.AuthorityHomeTenant))
             {
+                // Arrange
                 var parameters = harness.CreateRequestParams(
                     harness.Cache,
-                    MsalTestConstants.Scope);
+                    MsalTestConstants.Scope,
+                    MsalTestConstants.ExtraQueryParams);
 
-                var brokerParameters = new AcquireTokenByBrokerParameters();
+                // Act
+                var brokerParameters = parameters.CreateSilentRequestParametersForBroker();
 
-                var request = new BrokerSilentRequest(
-                    harness.ServiceBundle,
-                    parameters,
-                    brokerParameters);
+                // Assert
+                Assert.AreEqual(11, brokerParameters.Count);
 
-                Assert.AreEqual(8, brokerParameters.BrokerPayload.Count);
+                Assert.AreEqual(harness.Authority.AuthorityInfo.CanonicalAuthority, brokerParameters[BrokerParameter.Authority]);
+                Assert.AreEqual(MsalTestConstants.ScopeStr, brokerParameters[BrokerParameter.RequestScopes]);
+                Assert.AreEqual(MsalTestConstants.ClientId, brokerParameters[BrokerParameter.ClientId]);
 
-                Assert.AreEqual(harness.Authority.AuthorityInfo.CanonicalAuthority, brokerParameters.BrokerPayload[BrokerParameter.Authority]);
-                Assert.AreEqual(MsalTestConstants.ScopeStr, brokerParameters.BrokerPayload[BrokerParameter.RequestScopes]);
-                Assert.AreEqual(MsalTestConstants.ClientId, brokerParameters.BrokerPayload[BrokerParameter.ClientId]);
+                Assert.AreEqual(harness.ServiceBundle.DefaultLogger.CorrelationId.ToString(), brokerParameters[BrokerParameter.CorrelationId]);
+                Assert.AreEqual(MsalIdHelper.GetMsalVersion(), brokerParameters[BrokerParameter.ClientVersion]);
+                Assert.AreEqual(MsalTestConstants.DisplayableId, brokerParameters[BrokerParameter.Username]);
 
-                Assert.AreEqual(harness.ServiceBundle.DefaultLogger.CorrelationId.ToString(), brokerParameters.BrokerPayload[BrokerParameter.CorrelationId]);
-                Assert.AreEqual(MsalIdHelper.GetMsalVersion(), brokerParameters.BrokerPayload[BrokerParameter.ClientVersion]);
-                Assert.AreEqual(MsalTestConstants.DisplayableId, brokerParameters.BrokerPayload[BrokerParameter.Username]);
+                Assert.AreEqual(MsalTestConstants.BrokerExtraQueryParameters, brokerParameters[BrokerParameter.ExtraQp]);
 
-                // Assert.AreEqual(MsalTestConstants.BrokerExtraQueryParameters, brokerParameters.BrokerPayload[BrokerParameter.ExtraQp]);
-
-                // Assert.AreEqual(MsalTestConstants.BrokerClaims, brokerParameters.BrokerPayload[BrokerParameter.Claims]);
-                Assert.AreEqual(BrokerParameter.OidcScopesValue, brokerParameters.BrokerPayload[BrokerParameter.ExtraOidcScopes]);
-                Assert.IsTrue(brokerParameters.BrokerPayload.ContainsKey(BrokerParameter.SilentBrokerFlow));
+                // Assert.AreEqual(MsalTestConstants.BrokerClaims, brokerParameters[BrokerParameter.Claims]);
+                Assert.AreEqual(BrokerParameter.OidcScopesValue, brokerParameters[BrokerParameter.ExtraOidcScopes]);
+                Assert.IsTrue(brokerParameters.ContainsKey(BrokerParameter.SilentBrokerFlow));
             }
         }
 

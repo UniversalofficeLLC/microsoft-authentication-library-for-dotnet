@@ -174,26 +174,14 @@ namespace Microsoft.Identity.Client
             requestParams.LoginHint = interactiveParameters.LoginHint;
             requestParams.Account = interactiveParameters.Account;
 
-            if (requestParams.IsBrokerEnabled)
-            {
-                AcquireTokenByBrokerParameters brokerParameters = new AcquireTokenByBrokerParameters();
-                var handler = new BrokerInteractiveRequest(
+            var handler = new InteractiveRequest(
                 ServiceBundle,
                 requestParams,
-                brokerParameters);
+                interactiveParameters,
+                CreateWebAuthenticationDialog(interactiveParameters, requestParams.RequestContext));
 
-                return await handler.RunAsync(cancellationToken).ConfigureAwait(false);
-            }
-            else
-            {
-                var handler = new InteractiveRequest(
-                    ServiceBundle,
-                    requestParams,
-                    interactiveParameters,
-                    CreateWebAuthenticationDialog(interactiveParameters, requestParams.RequestContext));
+            return await handler.RunAsync(cancellationToken).ConfigureAwait(false);
 
-                return await handler.RunAsync(cancellationToken).ConfigureAwait(false);
-            }
         }
 
         async Task<AuthenticationResult> IPublicClientApplicationExecutor.ExecuteAsync(
@@ -244,29 +232,6 @@ namespace Microsoft.Identity.Client
             throw new PlatformNotSupportedException(
                 "Username Password is only supported on NetFramework and .NET Core." +
                 "For more details see https://aka.ms/msal-net-iwa");
-#endif
-        }
-
-        async Task<AuthenticationResult> IPublicClientApplicationExecutor.ExecuteAsync(
-            AcquireTokenCommonParameters commonParameters,
-            AcquireTokenByBrokerParameters brokerParameters,
-            CancellationToken cancellationToken)
-        {
-#if iOS
-            var requestParams = CreateRequestParameters(commonParameters, UserTokenCacheInternal);
-
-            var handler = new BrokerInteractiveRequest(
-                ServiceBundle,
-                requestParams,
-                brokerParameters);
-
-            return await handler.RunAsync(cancellationToken).ConfigureAwait(false);
-#else
-            await Task.Delay(0, cancellationToken).ConfigureAwait(false);  // this is here to keep compiler from complaining that this method is async when it doesn't await...
-            // TODO: need better wording and proper link to aka.ms
-            throw new PlatformNotSupportedException(
-                "Broker is only supported on mobile platforms (iOS and Android)" +
-                "For more details see ");
 #endif
         }
 

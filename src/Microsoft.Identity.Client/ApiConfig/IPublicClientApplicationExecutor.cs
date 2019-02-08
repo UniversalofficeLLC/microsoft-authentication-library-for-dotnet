@@ -52,10 +52,5 @@ namespace Microsoft.Identity.Client.ApiConfig
             AcquireTokenCommonParameters commonParameters,
             AcquireTokenByUsernamePasswordParameters usernamePasswordParameters,
             CancellationToken cancellationToken);
-
-        Task<AuthenticationResult> ExecuteAsync(
-            AcquireTokenCommonParameters commonParameters,
-            AcquireTokenByBrokerParameters acquireTokenParameters,
-            CancellationToken cancellationToken);
     }
 }

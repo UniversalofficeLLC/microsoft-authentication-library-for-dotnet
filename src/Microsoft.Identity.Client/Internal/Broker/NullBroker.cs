@@ -25,6 +25,7 @@
 // 
 // ------------------------------------------------------------------------------
 
+using Microsoft.Identity.Client.ApiConfig;
 using Microsoft.Identity.Client.Core;
 using Microsoft.Identity.Client.OAuth2;
 using System;
@@ -38,7 +39,10 @@ namespace Microsoft.Identity.Client.Internal.Broker
     /// </summary>
     internal class NullBroker : IBroker
     {
-        public bool CanInvokeBroker => false;
+        public bool CanInvokeBroker(OwnerUiParent uiParent, IServiceBundle serviceBundle)
+        {
+            return false;
+        }
 
         public Task<MsalTokenResponse> AcquireTokenUsingBrokerAsync(Dictionary<string, string> brokerPayload, IServiceBundle serviceBundle)
         {
