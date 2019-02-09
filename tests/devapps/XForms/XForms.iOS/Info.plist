@@ -21,6 +21,10 @@
       <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
 
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+      <string>msauthv2</string>
+    </array>
 
     <key>CFBundleURLTypes</key>
     <array>

@@ -61,7 +61,7 @@ namespace XForms.iOS
 
             iOSBrokerParameters.UIViewController = this;
 
-            App.UIParent = new UIParent(iOSBrokerParameters.UIViewController, true);
+            //App.UIParent = new UIParent(iOSBrokerParameters.UIViewController);
         }
     }
 }

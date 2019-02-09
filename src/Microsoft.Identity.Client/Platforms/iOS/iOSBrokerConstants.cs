@@ -64,5 +64,10 @@ namespace Microsoft.Identity.Client.Platforms.iOS
         public const string InvokeIosBrokerAppLink = "Invoking the iOS broker app link";
         public const string InvokeTheIosBroker = "Invoking the iOS broker";
         public const string FailedToSaveBrokerKey = "Failed to save broker key. Security Keychain Status code: ";
+        public const string UiParentIsNullCannotInvokeBroker = "UIParent is null cannot invoke broker. ";
+        public const string CallerViewControllerIsNullCannotInvokeBroker = "The CallerViewController is null. See aka.ms/iosBroker for details.";
+        public const string CanInvokeBroker = "Can invoke broker? ";
+        public const string CanInvokeBrokerReturnsFalseMessage = " - returned from CanOpenUrl. Msauthv2 needs to be included " +
+                    "in LSApplicationQueriesSchemes in Info.plist. See aka.ms/iosBroker for more information.";
     }
 }

@@ -46,7 +46,7 @@ namespace Microsoft.Identity.Client.Platforms.iOS
     /// <summary>
     /// Handles requests which invoke the broker. This is only for mobile (iOS and Android) scenarios.
     /// </summary>
-    internal class iOSBroker : NSObject, IBroker 
+    internal class iOSBroker : NSObject, IBroker
     {
         private static SemaphoreSlim brokerResponseReady = null;
 
@@ -67,7 +67,13 @@ namespace Microsoft.Identity.Client.Platforms.iOS
 
             if (uiParent == null)
             {
-                _logger.Verbose("UIParent is null cannot invoke broker. ");
+                _logger.Verbose(iOSBrokerConstants.UiParentIsNullCannotInvokeBroker);
+                return false;
+            }
+
+            if (uiParent.CoreUiParent.CallerViewController == null)
+            {
+                _logger.Verbose(iOSBrokerConstants.CallerViewControllerIsNullCannotInvokeBroker);
                 return false;
             }
 
@@ -75,12 +81,16 @@ namespace Microsoft.Identity.Client.Platforms.iOS
 
             if (_serviceBundle.Config.IsBrokerEnabled)
             {
-                _logger.Verbose("Can invoke broker? " + _serviceBundle.Config.IsBrokerEnabled);
-                
-                 uiParent.CoreUiParent.CallerViewController.InvokeOnMainThread(() =>
+                _logger.Verbose(iOSBrokerConstants.CanInvokeBroker + _serviceBundle.Config.IsBrokerEnabled);
+
+                uiParent.CoreUiParent.CallerViewController.InvokeOnMainThread(() =>
                 {
                     result = UIApplication.SharedApplication.CanOpenUrl(new NSUrl("msauthv2://"));
                 });
+            }
+            if (!result)
+            {
+                _logger.Verbose(result + iOSBrokerConstants.CanInvokeBrokerReturnsFalseMessage);
             }
 
             return result;
