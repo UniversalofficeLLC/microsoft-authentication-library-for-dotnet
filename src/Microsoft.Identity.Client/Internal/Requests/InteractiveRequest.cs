@@ -94,7 +94,7 @@ namespace Microsoft.Identity.Client.Internal.Requests
         {
             await ResolveAuthorityEndpointsAsync().ConfigureAwait(false);
 
-            CheckForBrokerAndAcquireAuthorizationAsync(cancellationToken);
+            await CheckForBrokerAndAcquireAuthorizationAsync(cancellationToken).ConfigureAwait(false);
 
             return CacheTokenResponseAndCreateAuthenticationResult(_msalTokenResponse);
         }
@@ -277,7 +277,7 @@ namespace Microsoft.Identity.Client.Internal.Requests
             }
         }
 
-        private async void CheckForBrokerAndAcquireAuthorizationAsync(CancellationToken cancellationToken)
+        private async Task CheckForBrokerAndAcquireAuthorizationAsync(CancellationToken cancellationToken)
         {
             BrokerHelper = brokerFactory.CreateBrokerFacade(ServiceBundle.DefaultLogger);
 

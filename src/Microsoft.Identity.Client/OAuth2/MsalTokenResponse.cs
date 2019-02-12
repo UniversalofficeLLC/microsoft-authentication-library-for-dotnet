@@ -102,12 +102,12 @@ namespace Microsoft.Identity.Client.OAuth2
 
         internal MsalTokenResponse CreateFromBrokerResponse(Dictionary<string, string> responseDictionary)
         {
-            if (responseDictionary.ContainsKey(ErrorDescription))
+            if (responseDictionary.ContainsKey("error_metadata"))
             {
                 return new MsalTokenResponse
                 {
-                    Error = responseDictionary[Error],
-                    ErrorDescription = responseDictionary[ErrorDescription]
+                    Error = responseDictionary["error_metadata"],
+                    ErrorDescription = responseDictionary["error_domain"]
                 };
             }
 

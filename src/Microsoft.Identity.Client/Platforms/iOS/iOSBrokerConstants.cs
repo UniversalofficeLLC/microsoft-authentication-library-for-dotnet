@@ -68,6 +68,10 @@ namespace Microsoft.Identity.Client.Platforms.iOS
         public const string CallerViewControllerIsNullCannotInvokeBroker = "The CallerViewController is null. See aka.ms/iosBroker for details.";
         public const string CanInvokeBroker = "Can invoke broker? ";
         public const string CanInvokeBrokerReturnsFalseMessage = " - returned from CanOpenUrl. Msauthv2 needs to be included " +
-                    "in LSApplicationQueriesSchemes in Info.plist. See aka.ms/iosBroker for more information.";
+                    "in LSApplicationQueriesSchemes in Info.plist. See aka.ms/iosBroker for more information. ";
+        public const string BrokerPayloadContainsInstallUrl = "iOS Broker - broker payload contains install url. ";
+        public const string StartingActionViewActivity = "iOS Broker - Starting ActionView activity to ";
+        public const string BrokerResponseContainsError = "Broker response contains an error. ";
+        public const string ProcessBrokerResponse = "Processed iOS Broker response. Response Dictionary count: ";
     }
 }

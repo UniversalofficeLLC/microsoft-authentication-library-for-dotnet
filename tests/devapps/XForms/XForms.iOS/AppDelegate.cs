@@ -80,10 +80,11 @@ namespace XForms.iOS
             return true;
         }
 
-        public override bool OpenUrl(UIApplication application, NSUrl url, string sourceApplication, NSObject annotation)
+        public override bool OpenUrl(UIApplication app, NSUrl url, string sourceApplication, NSObject annotation)
         {
             if (AuthenticationContinuationHelper.IsBrokerResponse(sourceApplication))
             {
+                System.Diagnostics.Debug.WriteLine("OpenURL called from AppDelegate {0}", url);
                 AuthenticationContinuationHelper.SetBrokerContinuationEventArgs(url);
             }
 

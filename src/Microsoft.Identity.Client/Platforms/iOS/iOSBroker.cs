@@ -49,8 +49,8 @@ namespace Microsoft.Identity.Client.Platforms.iOS
     internal class iOSBroker : NSObject, IBroker
     {
         private static SemaphoreSlim brokerResponseReady = null;
-
         private static NSUrl brokerResponse = null;
+
         private Dictionary<string, string> _brokerPayload;
 
         private readonly ICoreLogger _logger;
@@ -102,14 +102,9 @@ namespace Microsoft.Identity.Client.Platforms.iOS
 
             CheckBrokerPayloadForSilentFlow();
 
-            AddIosSpecificParametersToPayload();
+            AddIosSpecificParametersToPayload();           
 
-            brokerResponse = null;
-            brokerResponseReady = new SemaphoreSlim(0);
-
-            InvokeIosBroker();
-
-            await brokerResponseReady.WaitAsync().ConfigureAwait(false);
+            await InvokeIosBrokerAsync().ConfigureAwait(false);            
 
             return ProcessBrokerResponse();
         }
@@ -136,11 +131,14 @@ namespace Microsoft.Identity.Client.Platforms.iOS
             }
         }
 
-        private void InvokeIosBroker()
+        private async Task InvokeIosBrokerAsync()
         {
+            brokerResponse = null;
+            brokerResponseReady = new SemaphoreSlim(0);
+
             if (_brokerPayload.ContainsKey(BrokerParameter.BrokerInstallUrl))
             {
-                _logger.Info("iOS Broker - broker payload contains install url");
+                _logger.Info(iOSBrokerConstants.BrokerPayloadContainsInstallUrl);
 
                 string url = _brokerPayload[BrokerParameter.BrokerInstallUrl];
                 Uri uri = new Uri(url);
@@ -154,7 +152,7 @@ namespace Microsoft.Identity.Client.Platforms.iOS
                 _logger.Info(iOSBrokerConstants.InvokeIosBrokerAppLink);
 
                 Dictionary<string, string> keyPair = CoreHelpers.ParseKeyValueList(query, '&', true, false, null);
-                _logger.Info("iOS Broker - Starting ActionView activity to " + iOSBrokerConstants.AppLink);
+                _logger.Info(iOSBrokerConstants.StartingActionViewActivity + iOSBrokerConstants.AppLink);
                 DispatchQueue.MainQueue.DispatchAsync(() => UIApplication.SharedApplication.OpenUrl(new NSUrl(keyPair[iOSBrokerConstants.AppLink])));
 
                 throw new MsalClientException(MsalErrorIOSEx.BrokerApplicationRequired, MsalErrorMessageIOSEx.BrokerApplicationRequired);
@@ -168,6 +166,8 @@ namespace Microsoft.Identity.Client.Platforms.iOS
 
                 DispatchQueue.MainQueue.DispatchAsync(() => UIApplication.SharedApplication.OpenUrl(url));
             }
+
+            await brokerResponseReady.WaitAsync().ConfigureAwait(false);
         }
 
         private MsalTokenResponse ProcessBrokerResponse()
@@ -182,8 +182,11 @@ namespace Microsoft.Identity.Client.Platforms.iOS
                 if (responseDictionary[keyValue[0]].Equals("(null)", StringComparison.OrdinalIgnoreCase) && keyValue[0].Equals(iOSBrokerConstants.Code, StringComparison.OrdinalIgnoreCase))
                 {
                     responseDictionary[iOSBrokerConstants.Error] = iOSBrokerConstants.BrokerError;
+                    _logger.Verbose(iOSBrokerConstants.BrokerResponseContainsError);
                 }
             }
+
+            _logger.Verbose(iOSBrokerConstants.ProcessBrokerResponse + responseDictionary.Count);
 
             return ResultFromBrokerResponse(responseDictionary);
         }
