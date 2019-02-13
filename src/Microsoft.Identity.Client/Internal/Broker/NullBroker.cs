@@ -46,7 +46,7 @@ namespace Microsoft.Identity.Client.Internal.Broker
 
         public Task<MsalTokenResponse> AcquireTokenUsingBrokerAsync(Dictionary<string, string> brokerPayload, IServiceBundle serviceBundle)
         {
-            throw new NotImplementedException();
+            throw new PlatformNotSupportedException(CoreErrorMessages.BrokerNotSupportOnThisPlatform);
         }
     }
 }

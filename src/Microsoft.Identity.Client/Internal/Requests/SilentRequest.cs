@@ -41,7 +41,8 @@ namespace Microsoft.Identity.Client.Internal.Requests
     {
         private readonly AcquireTokenSilentParameters _silentParameters;
         private AuthenticationRequestParameters _authenticationRequestParameters;
-        IBroker BrokerHelper;
+        BrokerFactory brokerFactory = new BrokerFactory();
+        IBroker Broker;
 
         public SilentRequest(
             IServiceBundle serviceBundle,
@@ -126,17 +127,18 @@ namespace Microsoft.Identity.Client.Internal.Requests
 
         private async Task<MsalTokenResponse> CheckForBrokerAndSendTokenRequestAsync(MsalRefreshTokenCacheItem msalRefreshTokenItem, CancellationToken cancellationToken)
         {
+            Broker = brokerFactory.CreateBrokerFacade(ServiceBundle.DefaultLogger);
             MsalTokenResponse msalTokenResponse;
 
-            if(_authenticationRequestParameters.IsBrokerEnabled)
+            if (Broker.CanInvokeBroker(new ApiConfig.OwnerUiParent(), ServiceBundle))
             {
-                msalTokenResponse = await BrokerHelper.AcquireTokenUsingBrokerAsync(
+                msalTokenResponse = await Broker.AcquireTokenUsingBrokerAsync(
                     CreateBrokerPayload(),
                     ServiceBundle).ConfigureAwait(false);
             }
             else
             {
-                msalTokenResponse = await SendTokenRequestAsync(GetBodyParameters(msalRefreshTokenItem.Secret), cancellationToken)
+               msalTokenResponse = await SendTokenRequestAsync(GetBodyParameters(msalRefreshTokenItem.Secret), cancellationToken)
                                         .ConfigureAwait(false);
             }
 
@@ -145,7 +147,7 @@ namespace Microsoft.Identity.Client.Internal.Requests
 
         private Dictionary<string, string> CreateBrokerPayload()
         {
-            Dictionary<string, string> brokerPayload = _authenticationRequestParameters.CreateRequestParametersForBroker();
+            Dictionary<string, string> brokerPayload = _authenticationRequestParameters.CreateSilentRequestParametersForBroker();
             return brokerPayload;
         }
     }

@@ -71,7 +71,7 @@ namespace Microsoft.Identity.Client.Platforms.iOS
                 var result = SecKeyChain.Add(record);
                 if (result != SecStatusCode.Success)
                 {
-                    logger.Info(string.Format(CultureInfo.InvariantCulture, iOSBrokerConstants.FailedToSaveBrokerKey + result));
+                    logger.Info(iOSBrokerConstants.FailedToSaveBrokerKey + result);
                 }
 
                 brokerKey = byteData.ToArray();

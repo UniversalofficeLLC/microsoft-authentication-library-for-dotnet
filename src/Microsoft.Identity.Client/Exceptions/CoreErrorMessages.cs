@@ -155,5 +155,7 @@ namespace Microsoft.Identity.Client
         public const string AuthorityDoesNotHaveTwoSegments =
             "Authority should be in the form <host>/<audience>, for example https://login.microsoftonline.com/common";
         public const string AzureAdMyOrgRequiresSpecifyingATenant = "When specifying AadAuthorityAudience.AzureAdMyOrg, you must also specify a tenant domain or tenant guid.";
+
+        public const string BrokerNotSupportOnThisPlatform = "Broker is only supported on mobile platforms (Android and iOS). See https://aka.ms/msal-brokers for details";
     }
 }

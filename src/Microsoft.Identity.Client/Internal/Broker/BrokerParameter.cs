@@ -31,8 +31,6 @@ namespace Microsoft.Identity.Client.Internal.Broker
     //some are not in the list, not sure what they are for.
     internal class BrokerParameter
     {
-        //required parameters for broker
-        //msauthv2://broker w/following parameters
         public const string Authority = "authority";
         public const string ClientId = "client_id";
         public const string RequestScopes = "request_scopes";
@@ -43,7 +41,7 @@ namespace Microsoft.Identity.Client.Internal.Broker
         public const string ClientVersion = "client_version";
         public const string MsgProtocolVersion = "msg_protocol_ver";
 
-        //not required
+        // not required
         public const string CorrelationId = "correlation_id";
         public const string ExtraQp = "extra_qp";
         public const string HomeAccountId = "home_account_id";
@@ -58,12 +56,8 @@ namespace Microsoft.Identity.Client.Internal.Broker
         public const string ExtraConsentScopes = "extra_consent_scopes";
         public const string Prompt = "prompt";
 
-
-        //These are left over from ADAL
         public const string Force = "force";
-
-        public const string UsernameType = "username_type";
-
+        
         public const string SilentBrokerFlow = "silent_broker_flow";
         public const string BrokerInstallUrl = "broker_install_url";
     }

@@ -53,7 +53,7 @@ namespace Microsoft.Identity.Client.Internal.Requests
         private readonly AcquireTokenInteractiveParameters _interactiveParameters;
         private AuthenticationRequestParameters _authenticationRequestParameters;
         BrokerFactory brokerFactory = new BrokerFactory();
-        IBroker BrokerHelper;
+        IBroker Broker;
         MsalTokenResponse _msalTokenResponse;
 
         public InteractiveRequest(
@@ -279,11 +279,11 @@ namespace Microsoft.Identity.Client.Internal.Requests
 
         private async Task CheckForBrokerAndAcquireAuthorizationAsync(CancellationToken cancellationToken)
         {
-            BrokerHelper = brokerFactory.CreateBrokerFacade(ServiceBundle.DefaultLogger);
+            Broker = brokerFactory.CreateBrokerFacade(ServiceBundle.DefaultLogger);
 
-            if (BrokerHelper.CanInvokeBroker(_interactiveParameters.UiParent, ServiceBundle))
+            if (Broker.CanInvokeBroker(_interactiveParameters.UiParent, ServiceBundle))
             {
-                _msalTokenResponse = await BrokerHelper.AcquireTokenUsingBrokerAsync(
+                _msalTokenResponse = await Broker.AcquireTokenUsingBrokerAsync(
                     CreateBrokerPayload(),
                     ServiceBundle).ConfigureAwait(false);
             }

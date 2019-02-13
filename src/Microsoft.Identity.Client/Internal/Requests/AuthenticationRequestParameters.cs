@@ -96,7 +96,7 @@ namespace Microsoft.Identity.Client.Internal.Requests
 
         public bool IsBrokerEnabled { get; set; }
 
-        #region TODO REMOVE FROM HERE AND USE FROM SPECIFIC REQUEST PARAMETERS
+#region TODO REMOVE FROM HERE AND USE FROM SPECIFIC REQUEST PARAMETERS
         // TODO: ideally, these can come from the particular request instance and not be in RequestBase since it's not valid for all requests.
 
 #if !ANDROID_BUILDTIME && !iOS_BUILDTIME && !WINDOWS_APP_BUILDTIME && !MAC_BUILDTIME // Hide confidential client on mobile platforms
@@ -112,7 +112,7 @@ namespace Microsoft.Identity.Client.Internal.Requests
         public bool IsRefreshTokenRequest { get; set; }
         public UserAssertion UserAssertion { get; set; }
 
-        #endregion
+#endregion
 
         public void LogParameters(ICoreLogger logger)
         {
