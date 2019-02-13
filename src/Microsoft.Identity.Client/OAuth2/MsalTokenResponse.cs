@@ -104,12 +104,35 @@ namespace Microsoft.Identity.Client.OAuth2
         {
             if (responseDictionary.ContainsKey("error_metadata"))
             {
+                Error = responseDictionary["error_domain"];
+                ErrorDescription = CoreHelpers.UrlDecode(responseDictionary["error_metadata"]);
+
                 return new MsalTokenResponse
                 {
-                    Error = responseDictionary["error_metadata"],
-                    ErrorDescription = responseDictionary["error_domain"]
-                };
-            }
+                    Error = responseDictionary["error_domain"],
+                    ErrorDescription = CoreHelpers.UrlDecode(responseDictionary["error_metadata"])
+
+            };
+        }
+
+        System.Diagnostics.Debug.WriteLine("Processing broker token response");
+
+            Authority = responseDictionary.ContainsKey("authority")
+                   ? AppConfig.AuthorityInfo.CanonicalizeAuthorityUri(CoreHelpers.UrlDecode(responseDictionary["authority"]))
+                   : null;
+
+            AccessToken = responseDictionary["access_token"];
+            RefreshToken = responseDictionary.ContainsKey("refresh_token")
+                ? responseDictionary["refresh_token"]
+                : null;
+            IdToken = responseDictionary["id_token"];
+            TokenType = "Bearer";
+            CorrelationId = responseDictionary["correlation_id"];
+            Scope = responseDictionary["scope"];
+            ExpiresIn = long.Parse(responseDictionary["expires_on"].Split('.')[0], CultureInfo.CurrentCulture);
+            ClientInfo = responseDictionary.ContainsKey("client_info")
+                ? responseDictionary["client_info"]
+                : null;
 
             return new MsalTokenResponse
             {
@@ -129,6 +152,6 @@ namespace Microsoft.Identity.Client.OAuth2
                     ? responseDictionary["client_info"]
                     : null,
             };
-        }
+}
     }
 }

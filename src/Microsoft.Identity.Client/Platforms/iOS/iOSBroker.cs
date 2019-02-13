@@ -126,7 +126,7 @@ namespace Microsoft.Identity.Client.Platforms.iOS
             if (_brokerPayload.ContainsKey(iOSBrokerConstants.Claims))
             {
                 _brokerPayload.Add(iOSBrokerConstants.SkipCache, "YES");
-                string claims = Base64UrlHelpers.Encode(_brokerPayload[BrokerParameter.Claims]); //TODO: check this
+                string claims = Base64UrlHelpers.Encode(_brokerPayload[BrokerParameter.Claims]);
                 _brokerPayload[BrokerParameter.Claims] = claims;
             }
         }
@@ -223,9 +223,6 @@ namespace Microsoft.Identity.Client.Platforms.iOS
                     };
                 }
             }
-
-            var dateTimeOffset = new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc));
-            dateTimeOffset = dateTimeOffset.AddSeconds(tokenResponse.ExpiresIn);
 
             return tokenResponse;
         }

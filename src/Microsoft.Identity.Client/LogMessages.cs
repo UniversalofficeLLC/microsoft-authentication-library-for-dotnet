@@ -38,5 +38,14 @@ namespace Microsoft.Identity.Client
         {
             return string.Format(CultureInfo.InvariantCulture, "Using {0} scopes for acquire token by refresh token request", numScopes);
         }
+
+        public const string CheckMsalTokenResponseReturnedFromBroker = "Checking MsalTokenResponse returned from broker. ";
+        public const string BrokerResponseContainsAccessToken = "Broker response contains access token. Count of:  ";
+        public const string UnknownErrorRerturnedInBrokerResponse = "Unknown error returned in broker response. ";
+
+        public static string ErrorReturnedInBrokerResponse(string error)
+        {
+            return string.Format(CultureInfo.InvariantCulture, "Error {0} returned in broker response. ", error);
+        }
     }
 }

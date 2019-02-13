@@ -199,5 +199,10 @@ namespace Microsoft.Identity.Client
         /// Broker response hash did not match
         /// </summary>
         public const string BrokerReponseHashMismatch = "broker_response_hash_mismatch";
+
+        /// <summary>
+        /// Broker response returned an error
+        /// </summary>
+        public const string BrokerReponseReturnedError = "broker_response_returned_error";
     }
 }
